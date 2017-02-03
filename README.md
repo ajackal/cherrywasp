@@ -6,6 +6,10 @@ This program is desgined for network and target reconiassance to facilitate auth
 
 This program is designed as a probe request and beacon sniffer. You must have a monitor-mode NIC interface setup.
 
+## Most Current Version ##
+
+cherry-wasp-0.3.py is the most current version. Others left for historical purposes. In effect it is a fully functioning program, though there is still some fine tuning that needs to be done.
+
 # Usage #
 
 Mode 0 will sniff all probe requests and the BSSID (MAC address) that is probing and save them to a .csv file. You can filter by a specific BSSID with the "-b" option.
