@@ -32,11 +32,14 @@ class CherryWasp:
                     self.access_points.append(bssid)
                 if essid != "":
                     no_broadcast = True
-                if no_broadcast is True and essid not in bssid.beaconed_essid:
-                    bssid.add_new_essid(essid)
-                    print "[+] <{0}> is beaconing as {1}".format(colored(bssid.bssid, 'red'), colored(essid, 'green'))
-                    with open("beacon_essids.csv", "a") as b:
-                        b.write("{0},{1}\n".format(bssid.bssid, essid))
+                if no_broadcast is True:
+                    for access_point in self.access_points:
+                        if bssid is access_point.bssid and essid not in access_point.beaconed_essid:
+                            access_point.add_new_essid(essid)
+                            print "[+] <{0}> is beaconing as {1}".format(colored(bssid.bssid, 'red'),
+                                                                         colored(essid, 'green'))
+                            with open("beacon_essids.csv", "a") as b:
+                                b.write("{0},{1}\n".format(bssid.bssid, essid))
         if self.scan_type == '1' or self.scan_type == '2':
             if pkt.haslayer(Dot11ProbeReq):
                 essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
@@ -47,12 +50,14 @@ class CherryWasp:
                     self.clients.append(bssid)
                 if essid != "":
                     no_broadcast = True
-                if no_broadcast is True and essid not in bssid.requested_essid:
-                    bssid.add_new_essid(essid)
-                    print "[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'),
-                                                                        colored(bssid.bssid, 'red'))
-                    with open("probe_requests.csv", "a") as r:
-                        r.write("{0},{1}\n".format(bssid.bssid, essid))
+                if no_broadcast is True:
+                    for client in self.clients:
+                        if bssid is client.bssid and essid not in client.beaconed_essid:
+                            client.add_new_essid(essid)
+                            print "[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'),
+                                                                                colored(bssid.bssid, 'red'))
+                            with open("probe_requests.csv", "a") as r:
+                                r.write("{0},{1}\n".format(bssid.bssid, essid))
 
 
 class CherryAccessPoint:
