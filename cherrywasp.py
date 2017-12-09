@@ -32,7 +32,7 @@ class CherryWasp:
                     self.access_points.append(bssid)
                 if essid != "":
                     no_broadcast = True
-                if no_broadcast is True and essid not in self.access_points[bssid].beaconed_essid:
+                if no_broadcast is True and essid not in bssid.beaconed_essid:
                     bssid.add_new_essid(essid)
                     print "[+] <{0}> is beaconing as {1}".format(colored(bssid.bssid, 'red'), colored(essid, 'green'))
                     with open("beacon_essids.csv", "a") as b:
