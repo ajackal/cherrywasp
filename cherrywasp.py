@@ -24,7 +24,6 @@ class CherryWasp:
     def scan_packet(self, pkt):
         if self.scan_type == '0' or self.scan_type == '2':
             if pkt.haslayer(Dot11Beacon):
-                print "beacon found"
                 essid = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.info%}")
                 bssid = pkt.sprintf("%Dot11.addr2%")
                 no_broadcast = False
@@ -33,14 +32,13 @@ class CherryWasp:
                 if essid != "":
                     no_broadcast = True
                     self.access_points.append(bssid)
-                if no_broadcast is True: # and essid not in bssid.beaconed_essid:
+                if no_broadcast is True and essid not in bssid.beaconed_essid:
                     bssid.beaconed_essid.append(essid)
-                    print "[+] <{0}> is beaconing as {1}".format(colored(bssid, 'red'), colored(essid, 'green'))
+                    print "[+] <{0}> is beaconing as {1}".format(colored(bssid.bssid, 'red'), colored(essid, 'green'))
                     with open("beacon_essids.csv", "a") as b:
-                        b.write("{0},{1}\n".format(bssid, essid))
+                        b.write("{0},{1}\n".format(bssid.bssid, essid))
         if self.scan_type == '1' or self.scan_type == '2':
             if pkt.haslayer(Dot11ProbeReq):
-                print "probe request found"
                 essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
                 bssid = pkt.sprintf("%Dot11.addr2%")
                 no_broadcast = False
@@ -48,11 +46,12 @@ class CherryWasp:
                     bssid = CherryClient(bssid)
                 if essid != "":
                     no_broadcast = True
-                if no_broadcast is True: # and essid not in bssid.requested_essid:
+                if no_broadcast is True and essid not in bssid.requested_essid:
                     bssid.add_new_essid(essid)
-                    print "[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'), colored(bssid, 'red'))
+                    print "[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'),
+                                                                        colored(bssid.bssid, 'red'))
                     with open("probe_requests.csv", "a") as r:
-                        r.write("{0},{1}\n".format(bssid, essid))
+                        r.write("{0},{1}\n".format(bssid.bssid, essid))
 
 
 class CherryAccessPoint:
@@ -111,9 +110,7 @@ def main():
 
     try:
         scan_type = args.mode
-        print scan_type, type(scan_type)
         cherry_wasp = CherryWasp(scan_type)
-        print "object created."
     except Exception:
         raise
 
