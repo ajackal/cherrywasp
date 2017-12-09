@@ -112,7 +112,7 @@ def main():
 
     if args.bssid is None:
         if args.mode is not None:
-            sniff(prn=cherry_wasp.scan_packet())
+            sniff(prn=cherry_wasp.scan_packet)
         else:
             print "[!] invalid mode selected"
             print parser.usage
@@ -121,7 +121,7 @@ def main():
     if args.bssid is not None:  # TODO: add BSSID input validation here
         if args.mode is "0":
             filter_bssid = str("ether src " + args.bssid)
-            sniff(filter=filter_bssid, prn=cherry_wasp.scan_packet())
+            sniff(filter=filter_bssid, prn=cherry_wasp.scan_packet)
         else:
             print "[!] must use mode 0 when filtering by BSSID"
             exit(0)
