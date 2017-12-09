@@ -27,7 +27,9 @@ class CherryWasp:
                 essid = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.info%}")
                 bssid = pkt.sprintf("%Dot11.addr2%")
                 no_broadcast = False
-                if not self.access_points[bssid]:
+                try:
+                    self.access_points[bssid]
+                except KeyError:
                     new_bssid = {bssid, CherryAccessPoint(bssid)}
                     self.access_points.update(new_bssid)
                 if essid != "":
@@ -44,7 +46,9 @@ class CherryWasp:
                 essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
                 bssid = pkt.sprintf("%Dot11.addr2%")
                 no_broadcast = False
-                if not self.clients[bssid]:
+                try:
+                    self.clients[bssid]
+                except KeyError:
                     new_bssid = {bssid, CherryClient(bssid)}
                     self.clients.update(new_bssid)
                 if essid != "":
