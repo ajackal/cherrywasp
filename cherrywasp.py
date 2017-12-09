@@ -1,5 +1,5 @@
 from scapy.all import *
-import optparse
+import argparse
 from termcolor import colored
 
 
@@ -94,33 +94,33 @@ class CherryClient:
 
 
 def main():
-    parser = optparse.OptionParser('usage for print probe ' + '-m <scanning mode> ' + '-i <interface> ' + '-b <filter bssid> ')
-    parser.add_option('-m', dest='mode', type='string', help='0=beacons, 1=probe requests, 2=both')
-    parser.add_option('-i', dest='interface', type='string', help='specify interface to listen on')
-    parser.add_option('-b', dest='bssid', type='string', help='specify target bssid to filter <optional>')
-    (options, args) = parser.parse_args()
+    parser = argparse.ArgumentParser(description='Scan for 802.11 Beacon and/or Probe Requests.')
+    parser.add_argument(['-m', '--mode'], dest='mode', type='string', help='0=beacons, 1=probe requests, 2=both')
+    parser.add_argument(['-i', '--interface'], dest='interface', type='string', help='specify interface to listen on')
+    parser.add_argument(['-b', '--bssid'], dest='bssid', type='string', help='specify bssid to filter <optional>')
+    args = parser.parse_args()
 
-    if options.interface is None:
+    if args.interface is None:
         print "[!] must define an interface with <-i>!"
         print parser.usage
         exit(0)
     else:  # TODO: check interface for monitor mode
-        conf.iface = options.interface
+        conf.iface = args.interface
 
-    scan_type = options.mode
+    scan_type = args.mode
     cherry_wasp = CherryWasp(scan_type)
 
-    if options.bssid is None:
-        if options.mode is not None:
+    if args.bssid is None:
+        if args.mode is not None:
             sniff(prn=cherry_wasp.scan_packet())
         else:
             print "[!] invalid mode selected"
             print parser.usage
             exit(0)
 
-    if options.bssid is not None:  # TODO: add BSSID input validation here
-        if options.mode is "0":
-            filter_bssid = str("ether src " + options.bssid)
+    if args.bssid is not None:  # TODO: add BSSID input validation here
+        if args.mode is "0":
+            filter_bssid = str("ether src " + args.bssid)
             sniff(filter=filter_bssid, prn=cherry_wasp.scan_packet())
         else:
             print "[!] must use mode 0 when filtering by BSSID"
