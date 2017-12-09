@@ -107,8 +107,11 @@ def main():
     else:  # TODO: check interface for monitor mode
         conf.iface = args.interface
 
-    scan_type = args.mode
-    cherry_wasp = CherryWasp(scan_type)
+    try:
+        scan_type = args.mode
+        cherry_wasp = CherryWasp(scan_type)
+    except Exception:
+        raise
 
     if args.bssid is None:
         if args.mode is not None:
