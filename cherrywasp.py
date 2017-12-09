@@ -22,9 +22,9 @@ class CherryWasp:
         self.clients = []
 
     def scan_packet(self, pkt):
-        print "scanning packet"
         if self.scan_type == 0 or self.scan_type == 2:
             if pkt.haslayer(Dot11Beacon):
+                print "beacon found"
                 essid = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.info%}")
                 bssid = pkt.sprintf("%Dot11.addr2%")
                 no_broadcast = False
@@ -40,6 +40,7 @@ class CherryWasp:
                         b.write("{0},{1}\n".format(bssid, essid))
         if self.scan_type == 1 or self.scan_type == 2:
             if pkt.haslayer(Dot11ProbeReq):
+                print "probe request found"
                 essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
                 bssid = pkt.sprintf("%Dot11.addr2%")
                 no_broadcast = False
