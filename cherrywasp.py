@@ -29,6 +29,7 @@ class CherryWasp:
                 no_broadcast = False
                 if bssid not in self.access_points:
                     bssid = CherryAccessPoint(bssid)
+                    self.access_points.append(bssid)
                 if essid != "":
                     no_broadcast = True
                     self.access_points.append(bssid)
@@ -44,6 +45,7 @@ class CherryWasp:
                 no_broadcast = False
                 if bssid not in self.clients:
                     bssid = CherryClient(bssid)
+                    self.clients.append(bssid)
                 if essid != "":
                     no_broadcast = True
                 if no_broadcast is True and essid not in bssid.requested_essid:
