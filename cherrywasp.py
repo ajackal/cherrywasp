@@ -18,8 +18,8 @@ class CherryWasp:
             3. self.clients is a list of BSSIDs or MAC addresses of devices that are sending probe requests.
         """
         self.scan_type = scan_type
-        self.access_points = []
-        self.clients = []
+        self.access_points = {}
+        self.clients = {}
 
     def scan_packet(self, pkt):
         if self.scan_type == '0' or self.scan_type == '2':
@@ -27,13 +27,12 @@ class CherryWasp:
                 essid = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.info%}")
                 bssid = pkt.sprintf("%Dot11.addr2%")
                 no_broadcast = False
-                for access_point in self.access_points:
-                    if bssid not in access_point:
-                        bssid = CherryAccessPoint(bssid)
-                        self.access_points.append(bssid)
+                if not self.access_points[bssid]:
+                    new_bssid = {bssid, CherryAccessPoint(bssid)}
+                    self.access_points.update(new_bssid)
                 if essid != "":
                     no_broadcast = True
-                if no_broadcast is True and essid not in bssid.beaconed_essid:
+                if no_broadcast is True and essid not in self.access_points[bssid].beaconed_essid:
                     bssid.add_new_essid(essid)
                     print bssid.beaconed_essid
                     print "access points: {0}".format(self.access_points)
@@ -45,13 +44,12 @@ class CherryWasp:
                 essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
                 bssid = pkt.sprintf("%Dot11.addr2%")
                 no_broadcast = False
-                for client in self.clients:
-                    if bssid not in client:
-                        bssid = CherryClient(bssid)
-                        self.clients.append(bssid)
+                if not self.clients[bssid]:
+                    new_bssid = {bssid, CherryClient(bssid)}
+                    self.clients.update(new_bssid)
                 if essid != "":
                     no_broadcast = True
-                if no_broadcast is True and essid not in bssid.requested_essid:
+                if no_broadcast is True and essid not in self.clients[bssid].requested_essid:
                     bssid.add_new_essid(essid)
                     print bssid.requested_essid
                     print "clients: {0}".format(self.clients)
