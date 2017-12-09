@@ -95,9 +95,9 @@ class CherryClient:
 
 def main():
     parser = argparse.ArgumentParser(description='Scan for 802.11 Beacon and/or Probe Requests.')
-    parser.add_argument(['-m', '--mode'], type='string', help='0=beacons, 1=probe requests, 2=both')
-    parser.add_argument(['-i', '--interface'], type='string', help='specify interface to listen on')
-    parser.add_argument(['-b', '--bssid'], type='string', help='specify bssid to filter <optional>')
+    parser.add_argument('-m', '--mode', type='string', help='0=beacons, 1=probe requests, 2=both')
+    parser.add_argument('-i', '--interface', type='string', help='specify interface to listen on')
+    parser.add_argument('-b', '--bssid', type='string', help='specify bssid to filter <optional>')
     args = parser.parse_args()
 
     if args.interface is None:
