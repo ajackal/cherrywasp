@@ -22,6 +22,7 @@ class CherryWasp:
         self.clients = []
 
     def scan_packet(self, pkt):
+        print "scanning packet"
         if self.scan_type == 0 or self.scan_type == 2:
             if pkt.haslayer(Dot11Beacon):
                 essid = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.info%}")
@@ -109,7 +110,9 @@ def main():
 
     try:
         scan_type = args.mode
+        print scan_type
         cherry_wasp = CherryWasp(scan_type)
+        print "object created."
     except Exception:
         raise
 
