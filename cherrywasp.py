@@ -62,6 +62,8 @@ class CherryAccessPoint:
         2. BSSID is the MAC address of the access point.
         3. beaconed_essid is a list that holds all of the essids the MAC address has beaconed
         4. evil_access_point is False by default, but switches to True if it appear to beaconing too many ESSIDs
+
+        add_new_essid adds a new ESSID or network name to the list for the particular client.
     """
     def __init__(self, bssid):
         self.type = "access_point"
@@ -79,6 +81,8 @@ class CherryClient:
         1. Type defines it as a client.
         2. BSSID is the MAC address of the client seen.
         3. requested_essid is all of the ESSIDs that the client has requested.
+
+        add_new_essid adds a new ESSID or network name to the list for the particular client.
     """
     def __init__(self, bssid):
         self.type = "client"
@@ -111,6 +115,7 @@ def main():
             sniff(prn=cherry_wasp.scan_packet())
         else:
             print "[!] invalid mode selected"
+            print parser.usage
             exit(0)
 
     if options.bssid is not None:  # TODO: add BSSID input validation here
