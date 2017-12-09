@@ -35,8 +35,8 @@ class CherryWasp:
                 if no_broadcast is True and essid not in bssid.beaconed_essid:
                     bssid.beaconed_essid.append(essid)
                     print "[+] <{0}> is beaconing as {1}".format(colored(bssid, 'red'), colored(essid, 'green'))
-                    # with open("essid_beacons.csv", "a") as b:
-                    #     b.write("{0},{1}\n".format(bssid, essid))
+                    with open("beacon_essids.csv", "a") as b:
+                        b.write("{0},{1}\n".format(bssid, essid))
         if self.scan_type == 1 or self.scan_type == 2:
             if pkt.haslayer(Dot11ProbeReq):
                 essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
@@ -49,8 +49,8 @@ class CherryWasp:
                 if no_broadcast is True and essid not in bssid.requested_essid:
                     bssid.add_new_essid(essid)
                     print "[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'), colored(bssid, 'red'))
-                    # with open("essid_requests.csv", "a") as r:
-                    #     r.write("{0},{1}\n".format(bssid, essid))
+                    with open("probe_requests.csv", "a") as r:
+                        r.write("{0},{1}\n".format(bssid, essid))
 
 
 class CherryAccessPoint:
