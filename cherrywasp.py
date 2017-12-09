@@ -23,7 +23,7 @@ class CherryWasp:
 
     def scan_packet(self, pkt):
         if self.scan_type == 0 or self.scan_type == 2:
-            if pkt.haslayer(Dot11Beacon):
+            if pkt.haslayer(self.Dot11Beacon):
                 print "beacon found"
                 essid = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.info%}")
                 bssid = pkt.sprintf("%Dot11.addr2%")
@@ -39,7 +39,7 @@ class CherryWasp:
                     with open("beacon_essids.csv", "a") as b:
                         b.write("{0},{1}\n".format(bssid, essid))
         if self.scan_type == 1 or self.scan_type == 2:
-            if pkt.haslayer(Dot11ProbeReq):
+            if pkt.haslayer(self.Dot11ProbeReq):
                 print "probe request found"
                 essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
                 bssid = pkt.sprintf("%Dot11.addr2%")
