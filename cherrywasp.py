@@ -18,8 +18,8 @@ class CherryWasp:
             3. self.clients is a list of BSSIDs or MAC addresses of devices that are sending probe requests.
         """
         self.scan_type = scan_type
-        self.access_points = {}
-        self.clients = {}
+        self.access_points = []
+        self.clients = []
 
     def scan_packet(self, pkt):
         if self.scan_type == '0' or self.scan_type == '2':
@@ -27,17 +27,13 @@ class CherryWasp:
                 essid = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.info%}")
                 bssid = pkt.sprintf("%Dot11.addr2%")
                 no_broadcast = False
-                try:
-                    self.access_points[bssid]
-                except KeyError:
-                    new_bssid = {bssid, CherryAccessPoint(bssid)}
-                    self.access_points.update(new_bssid)
+                if bssid not in self.access_points:
+                    bssid = CherryAccessPoint(bssid)
+                    self.access_points.append(bssid)
                 if essid != "":
                     no_broadcast = True
                 if no_broadcast is True and essid not in self.access_points[bssid].beaconed_essid:
                     bssid.add_new_essid(essid)
-                    print bssid.beaconed_essid
-                    print "access points: {0}".format(self.access_points)
                     print "[+] <{0}> is beaconing as {1}".format(colored(bssid.bssid, 'red'), colored(essid, 'green'))
                     with open("beacon_essids.csv", "a") as b:
                         b.write("{0},{1}\n".format(bssid.bssid, essid))
@@ -46,17 +42,13 @@ class CherryWasp:
                 essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
                 bssid = pkt.sprintf("%Dot11.addr2%")
                 no_broadcast = False
-                try:
-                    self.clients[bssid]
-                except KeyError:
-                    new_bssid = {bssid, CherryClient(bssid)}
-                    self.clients.update(new_bssid)
+                if bssid not in self.clients:
+                    bssid = CherryClient(bssid)
+                    self.clients.append(bssid)
                 if essid != "":
                     no_broadcast = True
-                if no_broadcast is True and essid not in self.clients[bssid].requested_essid:
+                if no_broadcast is True and essid not in bssid.requested_essid:
                     bssid.add_new_essid(essid)
-                    print bssid.requested_essid
-                    print "clients: {0}".format(self.clients)
                     print "[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'),
                                                                         colored(bssid.bssid, 'red'))
                     with open("probe_requests.csv", "a") as r:
