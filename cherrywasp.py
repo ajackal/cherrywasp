@@ -28,8 +28,8 @@ class CherryWasp:
                 bssid = pkt.sprintf("%Dot11.addr2%")
                 no_broadcast = False
                 if bssid not in self.access_points:
-                    bssid = CherryAccessPoint(bssid)
                     self.access_points.append(bssid)
+                    bssid = CherryAccessPoint(bssid)
                 if essid != "":
                     no_broadcast = True
                 if no_broadcast is True and essid not in bssid.beaconed_essid:
@@ -45,8 +45,8 @@ class CherryWasp:
                 bssid = pkt.sprintf("%Dot11.addr2%")
                 no_broadcast = False
                 if bssid not in self.clients:
-                    bssid = CherryClient(bssid)
                     self.clients.append(bssid)
+                    bssid = CherryClient(bssid)
                 if essid != "":
                     no_broadcast = True
                 if no_broadcast is True and essid not in bssid.requested_essid:
