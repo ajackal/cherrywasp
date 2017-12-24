@@ -1,7 +1,7 @@
 from scapy.all import *
 import argparse
 from termcolor import colored
-from threading import BoundedSemaphore
+# from threading import BoundedSemaphore
 
 
 class CherryWasp:
@@ -24,11 +24,11 @@ class CherryWasp:
         self.access_points_bssids = []
         self.clients = []
         self.clients_bssids = []  # TODO: convert to set
-        MAX_CONNECTIONS = 20  # max threads that can be created
-        self.CONNECTION_LOCK = BoundedSemaphore(value=MAX_CONNECTIONS)
+        # MAX_CONNECTIONS = 20  # max threads that can be created
+        # self.CONNECTION_LOCK = BoundedSemaphore(value=MAX_CONNECTIONS)
 
     def scan_packet(self, pkt):
-        self.CONNECTION_LOCK.acquire()
+        # self.CONNECTION_LOCK.acquire()
         try:
             if self.scan_type == '0' or self.scan_type == '2':
                 if pkt.haslayer(Dot11Beacon):
@@ -68,8 +68,8 @@ class CherryWasp:
                                     r.write("{0},{1}\n".format(bssid.bssid, essid))
         except Exception:
             raise
-        finally:
-            self.CONNECTION_LOCK.release()
+        # finally:
+        #     self.CONNECTION_LOCK.release()
 
 
 class CherryAccessPoint:
