@@ -1,6 +1,7 @@
 from scapy.all import *
 import argparse
 from termcolor import colored
+from threading import BoundedSemaphore
 
 
 class CherryWasp:
@@ -20,44 +21,52 @@ class CherryWasp:
         self.scan_type = scan_type
         self.access_points = []
         self.clients = []
+        MAX_CONNECTIONS = 20  # max threads that can be created
+        self.CONNECTION_LOCK = BoundedSemaphore(value=MAX_CONNECTIONS)
 
     def scan_packet(self, pkt):
-        if self.scan_type == '0' or self.scan_type == '2':
-            if pkt.haslayer(Dot11Beacon):
-                essid = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.info%}")
-                bssid = pkt.sprintf("%Dot11.addr2%")
-                no_broadcast = False
-                if bssid not in self.access_points:
-                    bssid = CherryAccessPoint(bssid)
-                    self.access_points.append(bssid)
-                if essid != "":
-                    no_broadcast = True
-                if no_broadcast is True:
-                    for access_point in self.access_points:
-                        if bssid is access_point.bssid and essid not in access_point.beaconed_essid:
-                            access_point.add_new_essid(essid)
-                            print "[+] <{0}> is beaconing as {1}".format(colored(bssid.bssid, 'red'),
-                                                                         colored(essid, 'green'))
-                            with open("beacon_essids.csv", "a") as b:
-                                b.write("{0},{1}\n".format(bssid.bssid, essid))
-        if self.scan_type == '1' or self.scan_type == '2':
-            if pkt.haslayer(Dot11ProbeReq):
-                essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
-                bssid = pkt.sprintf("%Dot11.addr2%")
-                no_broadcast = False
-                if bssid not in self.clients:
-                    bssid = CherryClient(bssid)
-                    self.clients.append(bssid)
-                if essid != "":
-                    no_broadcast = True
-                if no_broadcast is True:
-                    for client in self.clients:
-                        if bssid is client.bssid and essid not in client.beaconed_essid:
-                            client.add_new_essid(essid)
-                            print "[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'),
-                                                                                colored(bssid.bssid, 'red'))
-                            with open("probe_requests.csv", "a") as r:
-                                r.write("{0},{1}\n".format(bssid.bssid, essid))
+        self.CONNECTION_LOCK.acquire()
+        try:
+            if self.scan_type == '0' or self.scan_type == '2':
+                if pkt.haslayer(Dot11Beacon):
+                    essid = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.info%}")
+                    bssid = pkt.sprintf("%Dot11.addr2%")
+                    no_broadcast = False
+                    if bssid not in self.access_points:
+                        bssid = CherryAccessPoint(bssid)
+                        self.access_points.append(bssid)
+                    if essid != "":
+                        no_broadcast = True
+                    if no_broadcast is True:
+                        for access_point in self.access_points:
+                            if bssid is access_point.bssid and essid not in access_point.beaconed_essid:
+                                access_point.add_new_essid(essid)
+                                print "[+] <{0}> is beaconing as {1}".format(colored(bssid.bssid, 'red'),
+                                                                             colored(essid, 'green'))
+                                with open("beacon_essids.csv", "a") as b:
+                                    b.write("{0},{1}\n".format(bssid.bssid, essid))
+            if self.scan_type == '1' or self.scan_type == '2':
+                if pkt.haslayer(Dot11ProbeReq):
+                    essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
+                    bssid = pkt.sprintf("%Dot11.addr2%")
+                    no_broadcast = False
+                    if bssid not in self.clients:
+                        bssid = CherryClient(bssid)
+                        self.clients.append(bssid)
+                    if essid != "":
+                        no_broadcast = True
+                    if no_broadcast is True:
+                        for client in self.clients:
+                            if bssid is client.bssid and essid not in client.beaconed_essid:
+                                client.add_new_essid(essid)
+                                print "[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'),
+                                                                                    colored(bssid.bssid, 'red'))
+                                with open("probe_requests.csv", "a") as r:
+                                    r.write("{0},{1}\n".format(bssid.bssid, essid))
+        except Exception:
+            raise
+        finally:
+            self.CONNECTION_LOCK.release()
 
 
 class CherryAccessPoint:
