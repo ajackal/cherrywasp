@@ -169,10 +169,13 @@ def main():
     parser.add_argument('-i', '--interface', help='specify interface(s) to listen on')
     parser.add_argument('-b', '--band', help='specify the band to scan, 2.4 or 5.0')
     parser.add_argument('-B', '--bssid', help='specify bssid to filter <mode 0 only> <optional>')
+    parser.add_argument('-o', '--output', help='specify a file prefix for saved files.')
     args = parser.parse_args()
 
     try:
-        assert args.mode == (0 or 1 or 2)
+        valid_modes = [0, 1, 2]
+        assert args.mode is not None
+        assert args.mode in valid_modes
         scan_type = args.mode
         cherry_wasp = CherryWasp(scan_type)
     except AssertionError:
@@ -192,7 +195,8 @@ def main():
         exit(0)
 
     try:
-        assert args.band == (2.4 or 5.0 or None)
+        valid_bands = [2.4, 5.0, None]
+        assert args.band in valid_bands
         if args.band is 2.4 or 5.0:
             band = str(args.band)
             print("[*] Scanning on {0}GHz band".format(band))
