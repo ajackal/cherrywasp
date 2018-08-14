@@ -112,7 +112,7 @@ class CherryAccessPoint:
 
 class CherryClient:
     """ Cherry Client
-        An object that reprenets a wireless client seen in that environment.
+        An object that represents a wireless client seen in that environment.
 
         1. Type defines it as a client.
         2. BSSID is the MAC address of the client seen.
@@ -133,7 +133,7 @@ def main():
     parser = argparse.ArgumentParser(description='Scan for 802.11 Beacon and/or Probe Requests.')
     parser.add_argument('-m', '--mode', help='0=beacons, 1=probe requests, 2=both')
     parser.add_argument('-i', '--interface', help='specify interface(s) to listen on')
-    parser.add_argument('-b', '--bssid', help='specify bssid to filter <optional>')
+    parser.add_argument('-b', '--bssid', help='specify bssid to filter <mode 0 only> <optional>')
     parser.add_argument('-B', '--band', help='specify the band to scan, 2.4 or 5.0')
     args = parser.parse_args()
 
