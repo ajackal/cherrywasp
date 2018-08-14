@@ -19,17 +19,22 @@ class CherryWasp:
         3. self.clients is a list of BSSIDs or MAC addresses of devices that are sending probe requests.
     """
 
-    def __init__(self, scan_type, interface):
+    def __init__(self, scan_type, interfaces):
         self.scan_type = scan_type
         self.access_points = []  # TODO: convert to set
         self.access_points_bssids = []
         self.clients = []
         self.clients_bssids = []  # TODO: convert to set
-        os.system("ip link set " + interface + " down")
-        os.system()
-        os.system("ip link set " + interface + " up")
+        for interface in interfaces:
+            self.create_mon_interface(interface)
         # MAX_CONNECTIONS = 20  # max threads that can be created
         # self.CONNECTION_LOCK = BoundedSemaphore(value=MAX_CONNECTIONS)
+
+    def create_mon_interface(self, interface):
+        os.system("ip link set " + interface + " down")
+        os.system("iw phy " + interface + " interface add mon0 type monitor")
+        os.system("iw dev " + interface + " del")
+        os.system("ip link set mon0 up")
 
     def scan_packet(self, pkt):
         # self.CONNECTION_LOCK.acquire()
