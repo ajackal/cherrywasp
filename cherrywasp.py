@@ -105,7 +105,7 @@ class CherryLogger:
     def __init__(self, file_name_prefix):
         self.file_path = os.getcwd() + os.path.join("logs")
         if os.path.exists(self.file_path) is False:
-            os.mkdir("logs")
+            os.mkdir(os.getcwd() + os.path.join("logs"))
         self.file_name_prefix = file_name_prefix
         self.headers = "bssid,essid"
         self.write_headers()
@@ -172,43 +172,49 @@ def main():
     args = parser.parse_args()
 
     try:
+        assert args.mode == (0 or 1 or 2)
         scan_type = args.mode
         cherry_wasp = CherryWasp(scan_type)
+    except AssertionError:
+        print("[!] Error, invalid mode selected!")
+        print(parser.usage)
+        exit(0)
     except Exception:
         raise
 
-    if args.interface is None:
-        print("[!] must define an interface with <-i>!")
-        print(parser.usage)
-        exit(0)
-    else:  # TODO: check interface for monitor mode
+    try:
+        assert args.interface is not None
         conf.iface = args.interface
         cherry_wasp.create_mon_interface(conf.iface)
+    except AssertionError:
+        print("[!] Must define an interface with <-i>!")
+        print(parser.usage)
+        exit(0)
 
-    if args.band is None:
-        band = "2.4"
-    elif args.band is 2.4 or 5.0:
-        band = str(args.band)
+    try:
+        assert args.band == (2.4 or 5.0 or None)
+        if args.band is 2.4 or 5.0:
+            band = str(args.band)
+            print("[*] Scanning on {0}GHz band".format(band))
+        else:
+            print("[*] No band defined, defaulting to 2.4GHz.")
+            band = "2.4"
+    except AssertionError:
+        print("[!] Invalid band selected.")
+        print(parser.usage)
+        exit(0)
 
-    if args.bssid is None:
-        if args.mode is not None:
+    try:
+        if args.bssid is None:
             sniff(prn=cherry_wasp.scan_packet)
             cherry_wasp.channel_hop(band)
-        else:
-            print("[!] invalid mode selected")
-            print(parser.usage)
-            exit(0)
-
-    if args.bssid is not None:  # TODO: add BSSID input validation here
-        if args.mode is "0":
+        else:  # TODO: add BSSID input validation here
+            assert args.mode is 0
             filter_bssid = str("ether src " + args.bssid)
             sniff(filter=filter_bssid, prn=cherry_wasp.scan_packet)
             cherry_wasp.channel_hop(band)
-        else:
-            print("[!] must use mode 0 when filtering by BSSID")
-            exit(0)
-    else:
-        print("[!] must define a mode with <-m>!")
+    except AssertionError:
+        print("[!] Invalid mode selected. No mode selected or must use mode 0 when filtering by BSSID")
         print(parser.usage)
         exit(0)
 
