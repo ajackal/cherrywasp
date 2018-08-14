@@ -30,13 +30,15 @@ class CherryWasp:
         # MAX_CONNECTIONS = 20  # max threads that can be created
         # self.CONNECTION_LOCK = BoundedSemaphore(value=MAX_CONNECTIONS)
 
-    def create_mon_interface(self, interface):
+    @staticmethod
+    def create_mon_interface(interface):
         os.system("ip link set " + interface + " down")
         os.system("iw phy " + interface + " interface add mon0 type monitor")
         os.system("iw dev " + interface + " del")
         os.system("ip link set mon0 up")
 
-    def channel_hop(self, band):
+    @staticmethod
+    def channel_hop(band):
         if band is "2.4":
             channels: "2412, 2417, 2422, 2427, 2432, 2437, 2442, 2447, 2452, 2457, 2462, 2467, 2472, 2484"
         if band is "5.0":
@@ -44,9 +46,10 @@ class CherryWasp:
                       "5320, 5340, 5480, 5500, 5510, 5520, 5530, 5540, 5550, 5560, 5570, 5580, 5590, 5600, 5610, 5620," \
                       "5630, 5640, 5660, 5670, 5680, 5690, 5700, 5710, 5720, 5745, 5755, 5765, 5775, 5785, 5795, 5805," \
                       "5825"
-        for channel in channels:
-            os.system("iw dev mon0 set freq " + channel)
-            os.sleep(5)
+        while True:
+            for channel in channels:
+                os.system("iw dev mon0 set freq " + channel)
+                time.sleep(5)
 
     def scan_packet(self, pkt):
         # self.CONNECTION_LOCK.acquire()
@@ -137,8 +140,8 @@ def main():
     parser = argparse.ArgumentParser(description='Scan for 802.11 Beacon and/or Probe Requests.')
     parser.add_argument('-m', '--mode', help='0=beacons, 1=probe requests, 2=both')
     parser.add_argument('-i', '--interface', help='specify interface(s) to listen on')
-    parser.add_argument('-b', '--bssid', help='specify bssid to filter <mode 0 only> <optional>')
-    parser.add_argument('-B', '--band', help='specify the band to scan, 2.4 or 5.0')
+    parser.add_argument('-b', '--band', help='specify the band to scan, 2.4 or 5.0')
+    parser.add_argument('-B', '--bssid', help='specify bssid to filter <mode 0 only> <optional>')
     args = parser.parse_args()
 
     try:
