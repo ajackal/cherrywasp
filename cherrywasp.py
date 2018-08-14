@@ -40,9 +40,13 @@ class CherryWasp:
         if band is "2.4":
             channels: "2412, 2417, 2422, 2427, 2432, 2437, 2442, 2447, 2452, 2457, 2462, 2467, 2472, 2484"
         if band is "5.0":
-            channels: ""
+            channels: "5160, 5170, 5180, 5190, 5200, 5210, 5220, 5230, 5240, 5250, 5260, 5270, 5280, 5290, 5300, 5310," \
+                      "5320, 5340, 5480, 5500, 5510, 5520, 5530, 5540, 5550, 5560, 5570, 5580, 5590, 5600, 5610, 5620," \
+                      "5630, 5640, 5660, 5670, 5680, 5690, 5700, 5710, 5720, 5745, 5755, 5765, 5775, 5785, 5795, 5805," \
+                      "5825"
         for channel in channels:
-            os.system("iw dev mon0  set freq " + channel)
+            os.system("iw dev mon0 set freq " + channel)
+            os.sleep(5)
 
     def scan_packet(self, pkt):
         # self.CONNECTION_LOCK.acquire()
