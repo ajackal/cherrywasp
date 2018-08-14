@@ -40,12 +40,12 @@ class CherryWasp:
     @staticmethod
     def channel_hop(band):
         if band is "2.4":
-            channels: "2412, 2417, 2422, 2427, 2432, 2437, 2442, 2447, 2452, 2457, 2462, 2467, 2472, 2484"
+            channels = "2412, 2417, 2422, 2427, 2432, 2437, 2442, 2447, 2452, 2457, 2462, 2467, 2472, 2484"
         if band is "5.0":
-            channels: "5160, 5170, 5180, 5190, 5200, 5210, 5220, 5230, 5240, 5250, 5260, 5270, 5280, 5290, 5300, 5310," \
-                      "5320, 5340, 5480, 5500, 5510, 5520, 5530, 5540, 5550, 5560, 5570, 5580, 5590, 5600, 5610, 5620," \
-                      "5630, 5640, 5660, 5670, 5680, 5690, 5700, 5710, 5720, 5745, 5755, 5765, 5775, 5785, 5795, 5805," \
-                      "5825"
+            channels = "5160, 5170, 5180, 5190, 5200, 5210, 5220, 5230, 5240, 5250, 5260, 5270, 5280, 5290, 5300, 5310," \
+                       "5320, 5340, 5480, 5500, 5510, 5520, 5530, 5540, 5550, 5560, 5570, 5580, 5590, 5600, 5610, 5620," \
+                       "5630, 5640, 5660, 5670, 5680, 5690, 5700, 5710, 5720, 5745, 5755, 5765, 5775, 5785, 5795, 5805," \
+                       "5825"
         while True:
             for channel in channels:
                 os.system("iw dev mon0 set freq " + channel)
@@ -88,12 +88,37 @@ class CherryWasp:
                                 client.add_new_essid(essid)
                                 print("[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'),
                                                                                     colored(bssid.bssid, 'red')))
-                                with open("probe_requests.csv", "a") as r:
-                                    r.write("{0},{1}\n".format(bssid.bssid, essid))
         except Exception:
             raise
         # finally:
         #     self.CONNECTION_LOCK.release()
+
+
+class CherryLogger:
+    """ Creates log files and logs results.
+
+    Inputs: file_name_prefix(str)
+
+    Returns: file written to disk"""
+    def __init__(self, file_name_prefix):
+        self.file_path = os.getcwd() + os.path.join("logs")
+        if os.path.exists(self.file_path) is False:
+            os.mkdir("logs")
+        self.file_name_prefix = file_name_prefix
+        self.headers = "bssid,essid"
+
+    def write_headers(self, file_name_prefix):
+        packet_types = ["beacon", "probe_request"]
+        for packet_type in packet_types:
+            file_name = file_name_prefix + "_" + packet_type + ".csv"
+            with open(file_name, 'a') as f:
+                f.write(self.headers)
+
+    @staticmethod
+    def write_to_file(file_name_prefix, packet_type, bssid, essid):
+        file_name = file_name_prefix + "_" + packet_type + ".csv"
+        with open(file_name, "a") as r:
+            r.write("{0},{1}\n".format(bssid, essid))
 
 
 class CherryAccessPoint:
