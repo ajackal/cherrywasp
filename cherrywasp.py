@@ -83,6 +83,11 @@ class CherryWasp:
                         self.clients.append(bssid)
                     if essid != "":
                         bssid.requested_essid.add(essid)
+                        # new way that might work?
+                        # ap = self.clients[bssid]
+                        # ap.requested_essid.add(essid)
+                        #
+                        # old way that works:
                         # for client in self.clients:
                         #     if bssid is client.bssid and essid not in client.beaconed_essid:
                         #         client.add_new_essid(essid)
