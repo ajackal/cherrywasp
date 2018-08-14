@@ -1,6 +1,7 @@
 from scapy.all import *
 import argparse
 from termcolor import colored
+import os
 # from threading import BoundedSemaphore
 
 
@@ -18,12 +19,15 @@ class CherryWasp:
         3. self.clients is a list of BSSIDs or MAC addresses of devices that are sending probe requests.
     """
 
-    def __init__(self, scan_type):
+    def __init__(self, scan_type, interface):
         self.scan_type = scan_type
         self.access_points = []  # TODO: convert to set
         self.access_points_bssids = []
         self.clients = []
         self.clients_bssids = []  # TODO: convert to set
+        os.system("ip link set " + interface + " down")
+        os.system()
+        os.system("ip link set " + interface + " up")
         # MAX_CONNECTIONS = 20  # max threads that can be created
         # self.CONNECTION_LOCK = BoundedSemaphore(value=MAX_CONNECTIONS)
 
@@ -44,8 +48,8 @@ class CherryWasp:
                         for access_point in self.access_points:
                             if bssid is access_point.bssid and essid not in access_point.beaconed_essid:
                                 access_point.add_new_essid(essid)
-                                print "[+] <{0}> is beaconing as {1}".format(colored(bssid.bssid, 'red'),
-                                                                             colored(essid, 'green'))
+                                print("[+] <{0}> is beaconing as {1}".format(colored(bssid.bssid, 'red'),
+                                                                             colored(essid, 'green')))
                                 with open("beacon_essids.csv", "a") as b:
                                     b.write("{0},{1}\n".format(bssid.bssid, essid))
             if self.scan_type == '1' or self.scan_type == '2':
@@ -62,8 +66,8 @@ class CherryWasp:
                         for client in self.clients:
                             if bssid is client.bssid and essid not in client.beaconed_essid:
                                 client.add_new_essid(essid)
-                                print "[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'),
-                                                                                    colored(bssid.bssid, 'red'))
+                                print("[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'),
+                                                                                    colored(bssid.bssid, 'red')))
                                 with open("probe_requests.csv", "a") as r:
                                     r.write("{0},{1}\n".format(bssid.bssid, essid))
         except Exception:
@@ -120,8 +124,8 @@ def main():
     args = parser.parse_args()
 
     if args.interface is None:
-        print "[!] must define an interface with <-i>!"
-        print parser.usage
+        print("[!] must define an interface with <-i>!")
+        print(parser.usage)
         exit(0)
     else:  # TODO: check interface for monitor mode
         conf.iface = args.interface
@@ -136,8 +140,8 @@ def main():
         if args.mode is not None:
             sniff(prn=cherry_wasp.scan_packet)
         else:
-            print "[!] invalid mode selected"
-            print parser.usage
+            print("[!] invalid mode selected")
+            print(parser.usage)
             exit(0)
 
     if args.bssid is not None:  # TODO: add BSSID input validation here
@@ -145,11 +149,11 @@ def main():
             filter_bssid = str("ether src " + args.bssid)
             sniff(filter=filter_bssid, prn=cherry_wasp.scan_packet)
         else:
-            print "[!] must use mode 0 when filtering by BSSID"
+            print("[!] must use mode 0 when filtering by BSSID")
             exit(0)
     else:
-        print "[!] must define a mode with <-m>!"
-        print parser.usage
+        print("[!] must define a mode with <-m>!")
+        print(parser.usage)
         exit(0)
 
 
