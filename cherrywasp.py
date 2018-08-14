@@ -55,6 +55,7 @@ class CherryWasp:
         # self.CONNECTION_LOCK.acquire()
         try:
             if self.scan_type == '0' or self.scan_type == '2':
+                packet_type = "beacon"
                 if pkt.haslayer(Dot11Beacon):
                     essid = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.info%}")
                     bssid = pkt.sprintf("%Dot11.addr2%")
@@ -70,9 +71,9 @@ class CherryWasp:
                                 access_point.add_new_essid(essid)
                                 print("[+] <{0}> is beaconing as {1}".format(colored(bssid.bssid, 'red'),
                                                                              colored(essid, 'green')))
-                                with open("beacon_essids.csv", "a") as b:
-                                    b.write("{0},{1}\n".format(bssid.bssid, essid))
+                                CherryLogger.write_to_file(packet_type, bssid.bssid, essid)
             if self.scan_type == '1' or self.scan_type == '2':
+                packet_type = "probe_request"
                 if pkt.haslayer(Dot11ProbeReq):
                     essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
                     bssid = pkt.sprintf("%Dot11.addr2%")
@@ -88,6 +89,7 @@ class CherryWasp:
                                 client.add_new_essid(essid)
                                 print("[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'),
                                                                                     colored(bssid.bssid, 'red')))
+                                CherryLogger.write_to_file(packet_type, bssid.bssid, essid)
         except Exception:
             raise
         # finally:
@@ -106,6 +108,7 @@ class CherryLogger:
             os.mkdir("logs")
         self.file_name_prefix = file_name_prefix
         self.headers = "bssid,essid"
+        self.write_headers()
 
     def write_headers(self):
         packet_types = ["beacon", "probe_request"]
