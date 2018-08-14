@@ -137,23 +137,24 @@ def main():
     parser.add_argument('-B', '--band', help='specify the band to scan, 2.4 or 5.0')
     args = parser.parse_args()
 
+    try:
+        scan_type = args.mode
+        cherry_wasp = CherryWasp(scan_type)
+    except Exception:
+        raise
+
     if args.interface is None:
         print("[!] must define an interface with <-i>!")
         print(parser.usage)
         exit(0)
     else:  # TODO: check interface for monitor mode
         conf.iface = args.interface
+        cherry_wasp.create_mon_interface(conf.iface)
 
     if args.band is None:
         band = "2.4"
     elif args.band is 2.4 or 5.0:
         band = str(args.band)
-
-    try:
-        scan_type = args.mode
-        cherry_wasp = CherryWasp(scan_type)
-    except Exception:
-        raise
 
     if args.bssid is None:
         if args.mode is not None:
