@@ -107,16 +107,15 @@ class CherryLogger:
         self.file_name_prefix = file_name_prefix
         self.headers = "bssid,essid"
 
-    def write_headers(self, file_name_prefix):
+    def write_headers(self):
         packet_types = ["beacon", "probe_request"]
         for packet_type in packet_types:
-            file_name = file_name_prefix + "_" + packet_type + ".csv"
+            file_name = self.file_name_prefix + "_" + packet_type + ".csv"
             with open(file_name, 'a') as f:
                 f.write(self.headers)
 
-    @staticmethod
-    def write_to_file(file_name_prefix, packet_type, bssid, essid):
-        file_name = file_name_prefix + "_" + packet_type + ".csv"
+    def write_to_file(self, packet_type, bssid, essid):
+        file_name = self.file_name_prefix + "_" + packet_type + ".csv"
         with open(file_name, "a") as r:
             r.write("{0},{1}\n".format(bssid, essid))
 
