@@ -66,12 +66,13 @@ class CherryWasp:
                         bssid = CherryAccessPoint(bssid)
                         self.access_points.add(bssid)
                     if essid != "":
-                        for access_point in self.access_points:
-                            if bssid is access_point.bssid and essid not in access_point.beaconed_essid:
-                                access_point.add_new_essid(essid)
-                                print("[+] <{0}> is beaconing as {1}".format(colored(bssid.bssid, 'red'),
-                                                                             colored(essid, 'green')))
-                                CherryLogger.write_to_file(packet_type, bssid.bssid, essid)
+                        bssid.beaconed_essid.add(essid)
+                        # for access_point in self.access_points:
+                        #     if bssid is access_point.bssid and essid not in access_point.beaconed_essid:
+                        #         access_point.add_new_essid(essid)
+                        print("[+] <{0}> is beaconing as {1}".format(colored(bssid.bssid, 'red'),
+                                                                     colored(essid, 'green')))
+                        CherryLogger.write_to_file(packet_type, bssid.bssid, essid)
             if self.scan_type == '1' or self.scan_type == '2':
                 packet_type = "probe_request"
                 if pkt.haslayer(Dot11ProbeReq):
@@ -81,12 +82,13 @@ class CherryWasp:
                         bssid = CherryClient(bssid)
                         self.clients.append(bssid)
                     if essid != "":
-                        for client in self.clients:
-                            if bssid is client.bssid and essid not in client.beaconed_essid:
-                                client.add_new_essid(essid)
-                                print("[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'),
-                                                                                    colored(bssid.bssid, 'red')))
-                                CherryLogger.write_to_file(packet_type, bssid.bssid, essid)
+                        bssid.requested_essid.add(essid)
+                        # for client in self.clients:
+                        #     if bssid is client.bssid and essid not in client.beaconed_essid:
+                        #         client.add_new_essid(essid)
+                        print("[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'),
+                                                                            colored(bssid.bssid, 'red')))
+                        CherryLogger.write_to_file(packet_type, bssid.bssid, essid)
         except Exception:
             raise
         # finally:
@@ -135,10 +137,10 @@ class CherryAccessPoint:
     def __init__(self, bssid):
         self.type = "access_point"
         self.bssid = bssid
-        self.beaconed_essid = []
+        self.beaconed_essid = set()
 
     def add_new_beaconded_essid(self, new_essid):
-        self.beaconed_essid.append(new_essid)
+        self.beaconed_essid.add(new_essid)
 
 
 class CherryClient:
@@ -154,10 +156,10 @@ class CherryClient:
     def __init__(self, bssid):
         self.type = "client"
         self.bssid = bssid
-        self.requested_essid = []
+        self.requested_essid = set()
 
     def add_new_requested_essid(self, new_essid):
-        self.requested_essid.append(new_essid)
+        self.requested_essid.add(new_essid)
 
 
 def main():
