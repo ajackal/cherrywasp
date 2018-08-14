@@ -79,7 +79,7 @@ class CherryWasp:
                     essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
                     bssid = pkt.sprintf("%Dot11.addr2%")
                     if bssid not in self.clients:
-                        bssid = CherryClient(bssid)
+                        bssid = CherryClient(bssid)  # Make DICTIONARY
                         self.clients.append(bssid)
                     if essid != "":
                         bssid.requested_essid.add(essid)
