@@ -1,3 +1,7 @@
+from termcolor import colored
+from logger import CherryLogger
+
+
 class CherryClient:
     """ Cherry Client
         An object that represents a wireless client seen in that environment.
@@ -12,6 +16,10 @@ class CherryClient:
         self.type = "client"
         self.bssid = bssid
         self.requested_essid = set()
+        self.log = CherryLogger("test1")
 
     def add_new_requested_essid(self, new_essid):
         self.requested_essid.add(new_essid)
+        print("[+] Probe Request for {0} from <{1}>".format(colored(new_essid, 'green'),
+                                                            colored(self.bssid, 'red')))
+        self.log.write_to_file("probe_request", self.bssid, new_essid)

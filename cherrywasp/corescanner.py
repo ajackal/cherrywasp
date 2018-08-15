@@ -2,6 +2,7 @@ from scapy.all import *
 import argparse
 from termcolor import colored
 import os
+from threading import Thread
 from logger import CherryLogger
 from accesspoint import CherryAccessPoint
 from client import CherryClient
@@ -42,15 +43,17 @@ class CherryWasp:
 
     @staticmethod
     def channel_hop(band):
-        if band is "2.4":
+        if "2.4" in band:
             channels = ["2412", "2417", "2422", "2427", "2432", "2437", "2442", "2447", "2452", "2457", "2462", "2467",
                         "2472", "2484"]
-        if band is "5.0":
+        elif "5.0" in band:
             channels = ["5160", "5170", "5180", "5190", "5200", "5210", "5220", "5230", "5240", "5250", "5260", "5270",
                         "5280", "5290", "5300", "5310", "5320", "5340", "5480", "5500", "5510", "5520", "5530", "5540",
                         "5550", "5560", "5570", "5580", "5590", "5600", "5610", "5620", "5630", "5640", "5660", "5670",
                         "5680", "5690", "5700", "5710", "5720", "5745", "5755", "5765", "5775", "5785", "5795", "5805",
                         "5825"]
+        else:
+            channels = []
         while True:
             for channel in channels:
                 os.system("iw dev mon0 set freq " + channel)
@@ -75,7 +78,7 @@ class CherryWasp:
                         #         access_point.add_new_essid(essid)
                         print("[+] <{0}> is beaconing as {1}".format(colored(self.clients[bssid].bssid, 'red'),
                                                                      colored(essid, 'green')))
-                        CherryLogger.write_to_file(packet_type, self.clients[bssid].bssid, essid)
+                        # CherryLogger.write_to_file(packet_type, self.clients[bssid].bssid, essid)
             if self.scan_type == '1' or self.scan_type == '2':
                 packet_type = "probe_request"
                 if pkt.haslayer(Dot11ProbeReq):
@@ -97,9 +100,9 @@ class CherryWasp:
                         # for client in self.clients:
                         #     if bssid is client.bssid and essid not in client.beaconed_essid:
                         #         client.add_new_essid(essid)
-                        print("[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'),
-                                                                            colored(self.clients[bssid].bssid, 'red')))
-                        CherryLogger.write_to_file(packet_type, self.clients[bssid].bssid, essid)
+                        # print("[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'),
+                        #                                                    colored(self.clients[bssid].bssid, 'red')))
+                        # CherryLogger.write_to_file(packet_type, self.clients[bssid].bssid, essid)
         except Exception:
             raise
         # finally:
@@ -153,13 +156,17 @@ def main():
 
     try:
         if args.bssid is None:
-            sniff(prn=cherry_wasp.scan_packet)
-            cherry_wasp.channel_hop(band)
+            channel_hop = Thread(target=cherry_wasp.channel_hop, args=[band])
+            channel_hop.daemon = True
+            channel_hop.start()
+            sniff(prn=cherry_wasp.scan_packet, store=0)
         else:  # TODO: add BSSID input validation here
             assert args.mode is 0
             filter_bssid = str("ether src " + args.bssid)
-            sniff(filter=filter_bssid, prn=cherry_wasp.scan_packet)
-            cherry_wasp.channel_hop(band)
+            channel_hop = Thread(target=cherry_wasp.channel_hop, args=[band])
+            channel_hop.daemon = True
+            channel_hop.start()
+            sniff(filter=filter_bssid, prn=cherry_wasp.scan_packet, store=0)
     except AssertionError:
         print("[!] Invalid mode selected. No mode selected or must use mode 0 when filtering by BSSID")
         print(parser.usage)
