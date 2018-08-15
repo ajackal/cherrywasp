@@ -2,6 +2,9 @@ from scapy.all import *
 import argparse
 from termcolor import colored
 import os
+from logger import CherryLogger
+from accesspoint import CherryAccessPoint
+from client import CherryClient
 # from threading import BoundedSemaphore
 
 
@@ -98,73 +101,6 @@ class CherryWasp:
             raise
         # finally:
         #     self.CONNECTION_LOCK.release()
-
-
-class CherryLogger:
-    """ Creates log files and logs results.
-
-    Inputs: file_name_prefix(str)
-
-    Returns: file written to disk"""
-    def __init__(self, file_name_prefix):
-        self.file_path = os.getcwd() + os.path.join("logs")
-        if os.path.exists(self.file_path) is False:
-            os.mkdir(os.getcwd() + os.path.join("logs"))
-        self.file_name_prefix = file_name_prefix
-        self.headers = "bssid,essid"
-        self.write_headers()
-
-    def write_headers(self):
-        packet_types = ["beacon", "probe_request"]
-        for packet_type in packet_types:
-            file_name = self.file_name_prefix + "_" + packet_type + ".csv"
-            with open(file_name, 'a') as f:
-                f.write(self.headers)
-
-    def write_to_file(self, packet_type, bssid, essid):
-        file_name = self.file_name_prefix + "_" + packet_type + ".csv"
-        with open(file_name, "a") as r:
-            r.write("{0},{1}\n".format(bssid, essid))
-
-
-class CherryAccessPoint:
-    """ Cherry Access Point:
-
-        An object that represents an Access Point seen in the environment.
-
-        1. Type defines it as an access point.
-        2. BSSID is the MAC address of the access point.
-        3. beaconed_essid is a list that holds all of the essids the MAC address has beaconed
-        4. evil_access_point is False by default, but switches to True if it appear to beaconing too many ESSIDs
-
-        add_new_essid adds a new ESSID or network name to the list for the particular client.
-    """
-    def __init__(self, bssid):
-        self.type = "access_point"
-        self.bssid = bssid
-        self.beaconed_essid = set()
-
-    def add_new_beaconded_essid(self, new_essid):
-        self.beaconed_essid.add(new_essid)
-
-
-class CherryClient:
-    """ Cherry Client
-        An object that represents a wireless client seen in that environment.
-
-        1. Type defines it as a client.
-        2. BSSID is the MAC address of the client seen.
-        3. requested_essid is all of the ESSIDs that the client has requested.
-
-        add_new_essid adds a new ESSID or network name to the list for the particular client.
-    """
-    def __init__(self, bssid):
-        self.type = "client"
-        self.bssid = bssid
-        self.requested_essid = set()
-
-    def add_new_requested_essid(self, new_essid):
-        self.requested_essid.add(new_essid)
 
 
 def main():
