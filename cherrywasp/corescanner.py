@@ -85,7 +85,10 @@ class CherryWasp:
                         new_client = CherryClient(bssid)
                         self.clients[bssid] = new_client
                     if essid != "":
+                        # more pythonic
                         self.clients[bssid].requested_essid.add(essid)
+                        # more java-ish
+                        self.clients[bssid].add_new_requested_essid(essid)
                         # new way that might work?
                         # ap = self.clients[bssid]
                         # ap.requested_essid.add(essid)
