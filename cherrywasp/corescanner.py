@@ -73,9 +73,9 @@ class CherryWasp:
                         # for access_point in self.access_points:
                         #     if bssid is access_point.bssid and essid not in access_point.beaconed_essid:
                         #         access_point.add_new_essid(essid)
-                        print("[+] <{0}> is beaconing as {1}".format(colored(bssid.bssid, 'red'),
+                        print("[+] <{0}> is beaconing as {1}".format(colored(self.clients[bssid].bssid, 'red'),
                                                                      colored(essid, 'green')))
-                        CherryLogger.write_to_file(packet_type, bssid.bssid, essid)
+                        CherryLogger.write_to_file(packet_type, self.clients[bssid].bssid, essid)
             if self.scan_type == '1' or self.scan_type == '2':
                 packet_type = "probe_request"
                 if pkt.haslayer(Dot11ProbeReq):
@@ -98,8 +98,8 @@ class CherryWasp:
                         #     if bssid is client.bssid and essid not in client.beaconed_essid:
                         #         client.add_new_essid(essid)
                         print("[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'),
-                                                                            colored(bssid.bssid, 'red')))
-                        CherryLogger.write_to_file(packet_type, bssid.bssid, essid)
+                                                                            colored(self.clients[bssid].bssid, 'red')))
+                        CherryLogger.write_to_file(packet_type, self.clients[bssid].bssid, essid)
         except Exception:
             raise
         # finally:
@@ -116,7 +116,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        valid_modes = [0, 1, 2]
+        valid_modes = ["0", "1", "2"]
         assert args.mode is not None
         assert args.mode in valid_modes
         scan_type = args.mode
@@ -138,9 +138,9 @@ def main():
         exit(0)
 
     try:
-        valid_bands = [2.4, 5.0, None]
+        valid_bands = ["2.4", "5.0", None]
         assert args.band in valid_bands
-        if args.band is 2.4 or 5.0:
+        if args.band is "2.4" or "5.0":
             band = str(args.band)
             print("[*] Scanning on {0}GHz band".format(band))
         else:
