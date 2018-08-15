@@ -26,7 +26,7 @@ class CherryWasp:
         self.scan_type = scan_type
         self.access_points = set()
         self.access_points_bssids = []
-        self.clients = []
+        self.clients = {}
         self.clients_bssids = set()
         # for interface in interfaces:
         #    self.create_mon_interface(interface)
@@ -82,10 +82,10 @@ class CherryWasp:
                     essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
                     bssid = pkt.sprintf("%Dot11.addr2%")
                     if bssid not in self.clients:
-                        bssid = CherryClient(bssid)  # Make DICTIONARY
-                        self.clients.append(bssid)
+                        new_client = CherryClient(bssid)
+                        self.clients[bssid] = new_client
                     if essid != "":
-                        bssid.requested_essid.add(essid)
+                        self.clients[bssid].requested_essid.add(essid)
                         # new way that might work?
                         # ap = self.clients[bssid]
                         # ap.requested_essid.add(essid)
