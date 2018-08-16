@@ -20,6 +20,6 @@ class CherryClient:
 
     def add_new_requested_essid(self, new_essid):
         self.requested_essid.add(new_essid)
+        self.log.write_to_file("probe_request", self.bssid, new_essid)
         print("[+] Probe Request for {0} from <{1}>".format(colored(new_essid, 'green'),
                                                             colored(self.bssid, 'red')))
-        self.log.write_to_file("probe_request", self.bssid, new_essid)

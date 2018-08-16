@@ -72,13 +72,7 @@ class CherryWasp:
                         bssid = CherryAccessPoint(bssid)
                         self.access_points.add(bssid)
                     if essid != "":
-                        bssid.beaconed_essid.add(essid)
-                        # for access_point in self.access_points:
-                        #     if bssid is access_point.bssid and essid not in access_point.beaconed_essid:
-                        #         access_point.add_new_essid(essid)
-                        print("[+] <{0}> is beaconing as {1}".format(colored(self.clients[bssid].bssid, 'red'),
-                                                                     colored(essid, 'green')))
-                        # CherryLogger.write_to_file(packet_type, self.clients[bssid].bssid, essid)
+                        self.clients[bssid].beaconed_essid.add(essid)
             if self.scan_type == '1' or self.scan_type == '2':
                 packet_type = "probe_request"
                 if pkt.haslayer(Dot11ProbeReq):
@@ -92,17 +86,6 @@ class CherryWasp:
                         self.clients[bssid].requested_essid.add(essid)
                         # more java-ish
                         self.clients[bssid].add_new_requested_essid(essid)
-                        # new way that might work?
-                        # ap = self.clients[bssid]
-                        # ap.requested_essid.add(essid)
-                        #
-                        # old way that works:
-                        # for client in self.clients:
-                        #     if bssid is client.bssid and essid not in client.beaconed_essid:
-                        #         client.add_new_essid(essid)
-                        # print("[+] Probe Request for {0} from <{1}>".format(colored(essid, 'green'),
-                        #                                                    colored(self.clients[bssid].bssid, 'red')))
-                        # CherryLogger.write_to_file(packet_type, self.clients[bssid].bssid, essid)
         except Exception:
             raise
         # finally:
