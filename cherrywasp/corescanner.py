@@ -33,6 +33,7 @@ class CherryWasp:
         self.access_points_bssids = set()
         self.clients = {}
         self.access_points = {}
+        self.file_prefix = ""
         # for interface in interfaces:
         #    self.create_mon_interface(interface)
         # MAX_CONNECTIONS = 20  # max threads that can be created
@@ -94,7 +95,7 @@ class CherryWasp:
                     essid = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.info%}")
                     bssid = pkt.sprintf("%Dot11.addr2%")
                     if bssid not in self.access_points:
-                        new_ap = CherryAccessPoint(bssid)
+                        new_ap = CherryAccessPoint(bssid, self.file_prefix)
                         self.access_points[bssid] = new_ap
                     if essid != "":
                         self.clients[bssid].add_new_beaconed_essid(essid)
@@ -104,7 +105,7 @@ class CherryWasp:
                     essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
                     bssid = pkt.sprintf("%Dot11.addr2%")
                     if bssid not in self.clients:
-                        new_client = CherryClient(bssid)
+                        new_client = CherryClient(bssid, self.file_prefix)
                         self.clients[bssid] = new_client
                     if essid != "":
                         self.clients[bssid].add_new_requested_essid(essid)
@@ -135,6 +136,13 @@ def main():
         exit(0)
     except Exception:
         raise
+
+    if args.output is not None:
+        file_prefix = args.output
+    else:
+        file_prefix = datetime.date()
+
+    cherry_wasp.file_prefix = file_prefix
 
     try:
         assert args.interface is not None
