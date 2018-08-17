@@ -12,23 +12,27 @@ from client import CherryClient
 class CherryWasp:
     """ Cherry Wasp
 
-        The object that inspects each packet and determines how to handle it
+        The object that inspects each packet and determines how to handle it.
 
-        1. scan_type is defined on the CLI by the user:
-            a. Scan Type 0 = Beacons only
-            b. Scan Type 1 = Probe Requests only
-            c. Scan Type 2 = Beacon & Probe Requests
+        Inputs: scan_type(str)
+            - 0 = Beacons only
+            - 1 = Probe Requests only
+            - 2 = Beacon & Probe Requests
 
-        2. self.access_points is a list of BSSIDs or MAC addresses of devices beaconing ESSIDs.
-        3. self.clients is a list of BSSIDs or MAC addresses of devices that are sending probe requests.
+        Returns: prints results to screen and saves to .csv file.
+
+        self.clients_bssids(set) of BSSIDs (MAC addresses) of devices sending probe requests.
+        self.access_points_bssids(set) of BSSIDs (MAC addresses) of devices beaconing ESSIDs.
+        self.clients(dict) of client objects {BSSID: <Obj>, BSSID: <Obj>}.
+        self.access_points(dict) of client objects {BSSID: <Obj>, BSSID: <Obj>}.
     """
 
     def __init__(self, scan_type):
         self.scan_type = scan_type
-        self.access_points = set()
-        self.access_points_bssids = []
-        self.clients = {}
         self.clients_bssids = set()
+        self.access_points_bssids = set()
+        self.clients = {}
+        self.access_points = {}
         # for interface in interfaces:
         #    self.create_mon_interface(interface)
         # MAX_CONNECTIONS = 20  # max threads that can be created
@@ -36,6 +40,12 @@ class CherryWasp:
 
     @staticmethod
     def create_mon_interface(interface):
+        """Method uses Linux system commands to stand up a monitoring interface.
+
+        Inputs: interface(str) the source interface to create a monitor interface.
+
+        Returns: None
+        """
         os.system("ip link set " + interface + " down")
         os.system("iw phy " + interface + " interface add mon0 type monitor")
         os.system("iw dev " + interface + " del")
@@ -43,6 +53,12 @@ class CherryWasp:
 
     @staticmethod
     def channel_hop(band):
+        """Method uses Linux system commands to change the channel the wireless card is listening on.
+
+        Inputs: band(str) "2.4", "5.0" or None
+
+        Returns: None
+        """
         if "2.4" in band:
             channels = ["2412", "2417", "2422", "2427", "2432", "2437", "2442", "2447", "2452", "2457", "2462", "2467",
                         "2472", "2484"]
@@ -61,6 +77,15 @@ class CherryWasp:
                 time.sleep(5)
 
     def scan_packet(self, pkt):
+        """ Function run by scapy's sniff function.
+
+        Inputs: self, pkt(scapy object)
+
+        Returns: value printed to console.
+
+        Cannot add any additional inputs, would need to create a nested function to add additional inputs.
+        Can add additional functionality by having it call methods from its class.
+        """
         # self.CONNECTION_LOCK.acquire()
         try:
             if self.scan_type == '0' or self.scan_type == '2':
@@ -69,10 +94,10 @@ class CherryWasp:
                     essid = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.info%}")
                     bssid = pkt.sprintf("%Dot11.addr2%")
                     if bssid not in self.access_points:
-                        bssid = CherryAccessPoint(bssid)
-                        self.access_points.add(bssid)
+                        new_ap = CherryAccessPoint(bssid)
+                        self.access_points[bssid] = new_ap
                     if essid != "":
-                        self.clients[bssid].beaconed_essid.add(essid)
+                        self.clients[bssid].add_new_beaconed_essid(essid)
             if self.scan_type == '1' or self.scan_type == '2':
                 packet_type = "probe_request"
                 if pkt.haslayer(Dot11ProbeReq):
@@ -82,9 +107,6 @@ class CherryWasp:
                         new_client = CherryClient(bssid)
                         self.clients[bssid] = new_client
                     if essid != "":
-                        # more pythonic
-                        self.clients[bssid].requested_essid.add(essid)
-                        # more java-ish
                         self.clients[bssid].add_new_requested_essid(essid)
         except Exception:
             raise
