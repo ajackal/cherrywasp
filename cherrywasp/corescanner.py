@@ -1,9 +1,8 @@
 from scapy.all import *
 import argparse
-from termcolor import colored
 import os
+import datetime
 from threading import Thread
-from logger import CherryLogger
 from accesspoint import CherryAccessPoint
 from client import CherryClient
 # from threading import BoundedSemaphore
@@ -130,6 +129,12 @@ def main():
         assert args.mode in valid_modes
         scan_type = args.mode
         cherry_wasp = CherryWasp(scan_type)
+        if args.output is not None:
+            file_prefix = args.output
+        else:
+            now = datetime.datetime.now()
+            file_prefix = str(now.year) + str(now.month) + str(now.day)
+        cherry_wasp.file_prefix = file_prefix
     except AssertionError:
         print("[!] Error, invalid mode selected!")
         print(parser.usage)
@@ -137,17 +142,10 @@ def main():
     except Exception:
         raise
 
-    if args.output is not None:
-        file_prefix = args.output
-    else:
-        file_prefix = datetime.date()
-
-    cherry_wasp.file_prefix = file_prefix
-
     try:
         assert args.interface is not None
         conf.iface = args.interface
-        cherry_wasp.create_mon_interface(conf.iface)
+        # cherry_wasp.create_mon_interface(conf.iface)
     except AssertionError:
         print("[!] Must define an interface with <-i>!")
         print(parser.usage)
