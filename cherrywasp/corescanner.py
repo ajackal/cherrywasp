@@ -52,13 +52,14 @@ class CherryWasp:
         os.system("ip link set mon0 up")
 
     @staticmethod
-    def channel_hop(band):
+    def channel_hop(band, dev_descriptor):
         """Method uses Linux system commands to change the channel the wireless card is listening on.
 
         Inputs: band(str) "2.4", "5.0" or None
 
         Returns: None
         """
+
         if "2.4" in band:
             channels = ["2412", "2417", "2422", "2427", "2432", "2437", "2442", "2447", "2452", "2457", "2462", "2467",
                         "2472", "2484"]
@@ -72,8 +73,8 @@ class CherryWasp:
             channels = []
         while True:
             for channel in channels:
-                os.system("iw dev mon0 set freq " + channel)
-                print("[*] Scanning channel {}".format(channel))
+                os.system("iwconfig {0} freq {1}M".format(dev_descriptor, channel))
+                print('[*] Scanning channel {0}'.format(channel))
                 time.sleep(5)
 
     def scan_packet(self, pkt):
@@ -97,7 +98,7 @@ class CherryWasp:
                         new_ap = CherryAccessPoint(bssid, self.file_prefix)
                         self.access_points[bssid] = new_ap
                     if essid != "":
-                        self.clients[bssid].add_new_beaconed_essid(essid)
+                        self.access_points[bssid].add_new_beaconed_essid(essid)
             if self.scan_type == '1' or self.scan_type == '2':
                 packet_type = "probe_request"
                 if pkt.haslayer(Dot11ProbeReq):
@@ -168,12 +169,15 @@ def main():
         print(parser.usage)
         exit(0)
 
-    channel_hop = False
+    if scan_type is "1":
+        channel_hop = False
+    else:
+        channel_hop = True
 
     try:
         if args.bssid is None:
             if channel_hop:
-                channel_hopper = Thread(target=cherry_wasp.channel_hop, args=[band])
+                channel_hopper = Thread(target=cherry_wasp.channel_hop, args=[band, args.interface])
                 channel_hopper.daemon = True
                 channel_hopper.start()
             sniff(prn=cherry_wasp.scan_packet, store=0)
@@ -181,7 +185,7 @@ def main():
             assert args.mode is 0
             filter_bssid = str("ether src " + args.bssid)
             if channel_hop:
-                channel_hopper = Thread(target=cherry_wasp.channel_hop, args=[band])
+                channel_hopper = Thread(target=cherry_wasp.channel_hop, args=[band, args.interface])
                 channel_hopper.daemon = True
                 channel_hopper.start()
             sniff(filter=filter_bssid, prn=cherry_wasp.scan_packet, store=0)

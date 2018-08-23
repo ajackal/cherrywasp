@@ -19,7 +19,7 @@ class CherryLogger:
         packet_types = ["beacon", "probe_request"]
         for packet_type in packet_types:
             file_name = self.file_name_prefix + "_" + packet_type + ".csv"
-            with open(file_name, 'a') as f:
+            with open(file_name, 'w') as f:
                 f.write(self.headers)
 
     def write_to_file(self, packet_type, bssid, essid):

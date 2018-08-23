@@ -20,7 +20,7 @@ class CherryAccessPoint:
         self.beaconed_essid = set()
         self.log = CherryLogger(file_prefix)
 
-    def add_new_beaconded_essid(self, new_essid):
+    def add_new_beaconed_essid(self, new_essid):
         if new_essid not in self.beaconed_essid:
             self.beaconed_essid.add(new_essid)
             self.log.write_to_file("beacon", self.bssid, new_essid)
