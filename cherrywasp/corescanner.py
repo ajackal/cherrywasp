@@ -165,18 +165,22 @@ def main():
         print(parser.usage)
         exit(0)
 
+    channel_hop = False
+
     try:
         if args.bssid is None:
-            channel_hop = Thread(target=cherry_wasp.channel_hop, args=[band])
-            channel_hop.daemon = True
-            channel_hop.start()
+            if channel_hop:
+                channel_hopper = Thread(target=cherry_wasp.channel_hop, args=[band])
+                channel_hopper.daemon = True
+                channel_hopper.start()
             sniff(prn=cherry_wasp.scan_packet, store=0)
         else:  # TODO: add BSSID input validation here
             assert args.mode is 0
             filter_bssid = str("ether src " + args.bssid)
-            channel_hop = Thread(target=cherry_wasp.channel_hop, args=[band])
-            channel_hop.daemon = True
-            channel_hop.start()
+            if channel_hop:
+                channel_hopper = Thread(target=cherry_wasp.channel_hop, args=[band])
+                channel_hopper.daemon = True
+                channel_hopper.start()
             sniff(filter=filter_bssid, prn=cherry_wasp.scan_packet, store=0)
     except AssertionError:
         print("[!] Invalid mode selected. No mode selected or must use mode 0 when filtering by BSSID")
