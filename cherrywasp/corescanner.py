@@ -142,10 +142,13 @@ def main():
     except Exception:
         raise
 
+    create_mon_interface = False
+
     try:
         assert args.interface is not None
         conf.iface = args.interface
-        # cherry_wasp.create_mon_interface(conf.iface)
+        if create_mon_interface:
+            cherry_wasp.create_mon_interface(conf.iface)
     except AssertionError:
         print("[!] Must define an interface with <-i>!")
         print(parser.usage)
