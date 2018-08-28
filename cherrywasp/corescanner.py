@@ -5,7 +5,6 @@ import datetime
 from threading import Thread
 from accesspoint import CherryAccessPoint
 from client import CherryClient
-# from threading import BoundedSemaphore
 
 
 class CherryWasp:
@@ -33,10 +32,6 @@ class CherryWasp:
         self.clients = {}
         self.access_points = {}
         self.file_prefix = ""
-        # for interface in interfaces:
-        #    self.create_mon_interface(interface)
-        # MAX_CONNECTIONS = 20  # max threads that can be created
-        # self.CONNECTION_LOCK = BoundedSemaphore(value=MAX_CONNECTIONS)
 
     @staticmethod
     def create_mon_interface(interface):
@@ -87,10 +82,8 @@ class CherryWasp:
         Cannot add any additional inputs, would need to create a nested function to add additional inputs.
         Can add additional functionality by having it call methods from its class.
         """
-        # self.CONNECTION_LOCK.acquire()
         try:
             if self.scan_type == '0' or self.scan_type == '2':
-                packet_type = "beacon"
                 if pkt.haslayer(Dot11Beacon):
                     essid = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.info%}")
                     bssid = pkt.sprintf("%Dot11.addr2%")
@@ -100,7 +93,6 @@ class CherryWasp:
                     if essid != "":
                         self.access_points[bssid].add_new_beaconed_essid(essid)
             if self.scan_type == '1' or self.scan_type == '2':
-                packet_type = "probe_request"
                 if pkt.haslayer(Dot11ProbeReq):
                     essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
                     bssid = pkt.sprintf("%Dot11.addr2%")
@@ -111,8 +103,6 @@ class CherryWasp:
                         self.clients[bssid].add_new_requested_essid(essid)
         except Exception:
             raise
-        # finally:
-        #     self.CONNECTION_LOCK.release()
 
 
 def main():
