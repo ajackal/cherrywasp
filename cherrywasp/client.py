@@ -1,5 +1,5 @@
 from termcolor import colored
-from logger import CherryLogger
+from cherrywasp import logger
 
 
 class CherryClient:
@@ -16,7 +16,7 @@ class CherryClient:
         self.type = "client"
         self.bssid = bssid
         self.requested_essid = set()
-        self.log = CherryLogger(file_prefix)
+        self.log = logger.CherryLogger(file_prefix)
 
     def add_new_requested_essid(self, new_essid):
         if new_essid not in self.requested_essid:

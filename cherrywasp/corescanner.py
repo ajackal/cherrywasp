@@ -3,8 +3,8 @@ import argparse
 import os
 import datetime
 from threading import Thread
-from accesspoint import CherryAccessPoint
-from client import CherryClient
+from cherrywasp import accesspoint
+from cherrywasp import client
 
 
 class CherryWasp:
@@ -88,7 +88,7 @@ class CherryWasp:
                     essid = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.info%}")
                     bssid = pkt.sprintf("%Dot11.addr2%")
                     if bssid not in self.access_points:
-                        new_ap = CherryAccessPoint(bssid, self.file_prefix)
+                        new_ap = accesspoint.CherryAccessPoint(bssid, self.file_prefix)
                         self.access_points[bssid] = new_ap
                     if essid != "":
                         self.access_points[bssid].add_new_beaconed_essid(essid)
@@ -98,7 +98,7 @@ class CherryWasp:
                     essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
                     bssid = pkt.sprintf("%Dot11.addr2%")
                     if bssid not in self.clients:
-                        new_client = CherryClient(bssid, self.file_prefix)
+                        new_client = client.CherryClient(bssid, self.file_prefix)
                         self.clients[bssid] = new_client
                     if essid != "":
                         self.clients[bssid].add_new_requested_essid(essid)
