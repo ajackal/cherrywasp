@@ -5,6 +5,7 @@ import datetime
 from threading import Thread
 from cherrywasp import accesspoint
 from cherrywasp import client
+from cherrywasp import logger
 
 
 class CherryWasp:
@@ -118,22 +119,23 @@ def main():
 
     try:
         valid_modes = ["0", "1", "2"]
-        assert args.mode is not None
-        assert args.mode in valid_modes
-        scan_type = args.mode
-        cherry_wasp = CherryWasp(scan_type)
-        if args.output is not None:
-            file_prefix = args.output
+        if args.mode is not None and args.mode in valid_modes:
+            scan_type = args.mode
+            cherry_wasp = CherryWasp(scan_type)
+            if args.output is not None:
+                file_prefix = args.output
+            else:
+                now = datetime.datetime.now()
+                file_prefix = str(now.year) + str(now.month) + str(now.day)
+            cherry_wasp.file_prefix = file_prefix
+            logger.CherryLogger.file_setup(file_prefix)
         else:
-            now = datetime.datetime.now()
-            file_prefix = str(now.year) + str(now.month) + str(now.day)
-        cherry_wasp.file_prefix = file_prefix
-    except AssertionError:
-        print("[!] Error, invalid mode selected!")
-        print(parser.usage)
-        exit(0)
+            print("[!] Invalid mode selected!")
+            exit(-1)
     except Exception:
-        raise
+        print("[!] Error, starting the listener!")
+        print(parser.usage)
+        exit(-1)
 
     create_mon_interface = False
 
