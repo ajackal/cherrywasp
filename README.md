@@ -1,6 +1,6 @@
 # cherry-wasp README #
 
-https://travis-ci.org/ajackal/cherry-wasp.svg?branch=master
+![Travis CI Build Status](https://travis-ci.org/ajackal/cherry-wasp.svg?branch=master)
 
 ## Intent ##
 
