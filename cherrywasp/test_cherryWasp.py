@@ -1,5 +1,5 @@
 from unittest import TestCase
-from corescanner import CherryWasp
+from cherrywasp import corescanner
 from scapy.all import *
 
 
@@ -15,7 +15,7 @@ class TestCherryWasp(TestCase):
         scan_type = "0"
         expected = 'My_SSID'
         pkt_ap = Dot11(addr1="de:ad:be:ef:01:23", addr2="00:00:11:11:22:22") / Dot11Beacon() / Dot11Elt(ID=0, info="My_SSID")
-        cherry_wasp = CherryWasp(scan_type)
+        cherry_wasp = corescanner.CherryWasp(scan_type)
         actual = cherry_wasp.scan_packet(pkt_ap)
         self.assertIn(expected, actual, msg="Failed SSID match.")
         # self.fail()
@@ -24,7 +24,7 @@ class TestCherryWasp(TestCase):
         scan_type = "1"
         expected = 'My_SSID'
         pkt_pr = Dot11(addr1="de:ad:be:ef:01:23", addr2="00:00:11:11:22:22") / Dot11ProbeReq() / Dot11Elt(ID=0, info="My_SSID")
-        cherry_wasp = CherryWasp(scan_type)
+        cherry_wasp = corescanner.CherryWasp(scan_type)
         actual = cherry_wasp.scan_packet(pkt_pr)
         self.assertIn(expected, actual, msg="Failed SSID match.")
         # self.fail()
