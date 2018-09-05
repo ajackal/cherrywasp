@@ -117,76 +117,68 @@ def main():
     parser.add_argument('-o', '--output', help='specify a file prefix for saved files.')
     args = parser.parse_args()
 
-    try:
-        valid_modes = ["0", "1", "2"]
-        if args.mode is not None and args.mode in valid_modes:
-            scan_type = args.mode
-            cherry_wasp = CherryWasp(scan_type)
-            if args.output is not None:
-                file_prefix = args.output
-            else:
-                now = datetime.datetime.now()
-                file_prefix = str(now.year) + str(now.month) + str(now.day)
-            cherry_wasp.file_prefix = file_prefix
-            logger.CherryLogger.file_setup(file_prefix)
+    valid_modes = ["0", "1", "2"]
+    if args.mode is not None and args.mode in valid_modes:
+        scan_type = args.mode
+        if scan_type is "1":
+            channel_hop = False
         else:
-            print("[!] Invalid mode selected!")
-            exit(-1)
-    except Exception:
+            channel_hop = True
+        cherry_wasp = CherryWasp(scan_type)
+        if args.output is not None:
+            file_prefix = args.output
+        else:
+            now = datetime.datetime.now()
+            file_prefix = str(now.year) + str(now.month) + str(now.day)
+        cherry_wasp.file_prefix = file_prefix
+        logger.CherryLogger.file_setup(file_prefix)
+    else:
         print("[!] Error, starting the listener!")
         print(parser.usage)
         exit(-1)
 
-    create_mon_interface = False
-
-    try:
-        assert args.interface is not None
+    if args.interface is not None:
         conf.iface = args.interface
-        if create_mon_interface:
-            cherry_wasp.create_mon_interface(conf.iface)
-    except AssertionError:
-        print("[!] Must define an interface with <-i>!")
+    else:
+        print("[!] Error, no interface defined!")
         print(parser.usage)
-        exit(0)
+        exit(-1)
 
-    try:
-        valid_bands = ["2.4", "5.0", None]
-        assert args.band in valid_bands
+    create_mon_interface = False
+    if create_mon_interface:
+        cherry_wasp.create_mon_interface(conf.iface)
+
+    valid_bands = ["2.4", "5.0", None]
+    if args. band in valid_bands:
         if args.band is "2.4" or "5.0":
             band = str(args.band)
             print("[*] Scanning on {0}GHz band".format(band))
         else:
             print("[*] No band defined, defaulting to 2.4GHz.")
             band = "2.4"
-    except AssertionError:
-        print("[!] Invalid band selected.")
-        print(parser.usage)
-        exit(0)
-
-    if scan_type is "1":
-        channel_hop = False
     else:
-        channel_hop = True
+        print("[!] Error, invalid band selected!")
+        print(parser.usage)
+        exit(-1)
 
-    try:
-        if args.bssid is None:
-            if channel_hop:
-                channel_hopper = Thread(target=cherry_wasp.channel_hop, args=[band, args.interface])
-                channel_hopper.daemon = True
-                channel_hopper.start()
-            sniff(prn=cherry_wasp.scan_packet, store=0)
-        else:  # TODO: add BSSID input validation here
-            assert args.mode is 0
+    if args.bssid is None:
+        if channel_hop:
+            channel_hopper = Thread(target=cherry_wasp.channel_hop, args=[band, args.interface])
+            channel_hopper.daemon = True
+            channel_hopper.start()
+        sniff(prn=cherry_wasp.scan_packet, store=0)
+    else:  # TODO: add BSSID input validation here
+        if args.mode is "0":
             filter_bssid = str("ether src " + args.bssid)
             if channel_hop:
                 channel_hopper = Thread(target=cherry_wasp.channel_hop, args=[band, args.interface])
                 channel_hopper.daemon = True
                 channel_hopper.start()
             sniff(filter=filter_bssid, prn=cherry_wasp.scan_packet, store=0)
-    except AssertionError:
-        print("[!] Invalid mode selected. No mode selected or must use mode 0 when filtering by BSSID")
-        print(parser.usage)
-        exit(0)
+        else:
+            print("[!] Invalid mode selected. No mode selected or must use mode 0 when filtering by BSSID")
+            print(parser.usage)
+            exit(-1)
 
 
 if __name__ == "__main__":
