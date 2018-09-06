@@ -1,14 +1,12 @@
 # cherry-wasp README #
 
+![Travis CI Build Status](https://travis-ci.org/ajackal/cherry-wasp.svg?branch=master)
+
 ## Intent ##
 
-This program is desgined for network and target reconiassance to facilitate authorized white-hat wireless pen-testers or enthusiasts testing on their own network or lab enviornment.
+This program is desgined for network and target reconiassance to facilitate authorized wireless penetration tests or enthusiasts testing on their own network or lab enviornment.
 
 This program is designed as a probe request and beacon sniffer. You must have a monitor-mode NIC interface setup.
-
-## Most Current Version ##
-
-cherry-wasp-0.3.py is the most current version. Others left for historical purposes. In effect it is a fully functioning program, though there is still some fine tuning that needs to be done.
 
 # Usage #
 
