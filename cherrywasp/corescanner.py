@@ -101,7 +101,7 @@ class CherryWasp:
                     if bssid not in self.clients:
                         new_client = client.CherryClient(bssid, self.file_prefix)
                         self.clients[bssid] = new_client
-                    if essid != "":
+                    if essid != "b''":
                         self.clients[bssid].add_new_requested_essid(essid)
                         return essid
         except Exception:
