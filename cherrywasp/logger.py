@@ -24,7 +24,7 @@ class CherryLogger:
         for packet_type in packet_types:
             file_name = self.file_name_prefix + "_" + packet_type + ".csv"
             full_path = os.path.join(self.file_path, file_name)
-            with open(full_path, "a") as f:
+            with open(full_path, "w") as f:
                 f.write(self.headers)
         return True
 
