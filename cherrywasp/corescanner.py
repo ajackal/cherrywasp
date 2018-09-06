@@ -131,7 +131,8 @@ def main():
             now = datetime.datetime.now()
             file_prefix = str(now.year) + str(now.month) + str(now.day)
         cherry_wasp.file_prefix = file_prefix
-        logger.CherryLogger.file_setup(file_prefix)
+        log = logger.CherryLogger()
+        log.file_setup(cherry_wasp.file_prefix)
     else:
         print("[!] Error, starting the listener!")
         print(parser.usage)
