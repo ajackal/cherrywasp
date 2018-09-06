@@ -13,13 +13,13 @@ class TestCherryLogger(TestCase):
         self.assertTrue(expected, msg="Log file setup failed.")
         # self.fail()
 
-    def test_write_headers(self):
-        now = datetime.now()
-        file_prefix = str(now.year) + str(now.month) + str(now.day)
-        log = logger.CherryLogger()
-        log.file_name_prefix = file_prefix
-        expected = log.write_headers()
-        self.assertTrue(expected, msg="Log file write headers failed.")
+    # def test_write_headers(self):
+    #     now = datetime.now()
+    #     file_prefix = str(now.year) + str(now.month) + str(now.day)
+    #     log = logger.CherryLogger()
+    #     log.file_name_prefix = file_prefix
+    #     expected = log.write_headers()
+    #     self.assertTrue(expected, msg="Log file write headers failed.")
         # self.fail()
 
     def test_write_to_file(self):
