@@ -10,12 +10,12 @@ class CherryLogger:
     def __init__(self):
         self.file_name_prefix = ""
         self.headers = "bssid,essid"
-        self.file_path = os.getcwd() + os.path.join("logs")
+        self.file_path = os.getcwd() + os.path.join("/logs")
 
     def file_setup(self, file_prefix):
         self.file_name_prefix = file_prefix
         if os.path.exists(self.file_path) is False:
-            os.mkdir(os.getcwd() + os.path.join("logs"))
+            os.mkdir(os.getcwd() + os.path.join("/logs"))
         self.write_headers()
 
     def write_headers(self):
