@@ -91,8 +91,8 @@ class CherryWasp:
                     if bssid not in self.access_points:
                         new_ap = accesspoint.CherryAccessPoint(bssid, self.file_prefix)
                         self.access_points[bssid] = new_ap
-                    if essid != "":
-                        self.access_points[bssid].add_new_beaconed_essid(essid)
+                    if essid != "b''":
+                        updater = self.access_points[bssid].add_new_beaconed_essid(essid)
                         return essid
             if self.scan_type == '1' or self.scan_type == '2':
                 if pkt.haslayer(Dot11ProbeReq):
@@ -102,7 +102,7 @@ class CherryWasp:
                         new_client = client.CherryClient(bssid, self.file_prefix)
                         self.clients[bssid] = new_client
                     if essid != "b''":
-                        self.clients[bssid].add_new_requested_essid(essid)
+                        updater = self.clients[bssid].add_new_requested_essid(essid)
                         return essid
         except Exception:
             raise
