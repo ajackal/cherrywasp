@@ -24,4 +24,4 @@ class CherryClient:
             self.requested_essid.add(new_essid)
             self.log.write_to_file("probe_request", self.bssid, new_essid)
             return "[+] Probe Request for {0} from <{1}>".format(colored(new_essid, 'green'),
-                                                                colored(self.bssid, 'red'))
+                                                                 colored(self.bssid, 'red'))

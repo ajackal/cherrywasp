@@ -21,9 +21,10 @@ class CherryAccessPoint:
         self.log = logger.CherryLogger()
         self.log.file_name_prefix = file_prefix
 
+    # TODO: Add channel to the output & file.
     def add_new_beaconed_essid(self, new_essid):
         if new_essid not in self.beaconed_essid:
             self.beaconed_essid.add(new_essid)
             self.log.write_to_file("beacon", self.bssid, new_essid)
             return "[+] <{0}> is beaconing as {1}".format(colored(self.bssid, 'red'),
-                                                         colored(new_essid, 'green'))
+                                                          colored(new_essid, 'green'))
