@@ -3,9 +3,9 @@ import argparse
 import os
 import datetime
 from threading import Thread
-from cherrywasp import accesspoint
-from cherrywasp import client
-from cherrywasp import logger
+import accesspoint
+import client
+import logger
 
 
 class CherryWasp:
@@ -147,14 +147,13 @@ def main():
     if create_mon_interface:
         cherry_wasp.create_mon_interface(conf.iface)
 
-    valid_bands = ["2.4", "5.0", None]
-    if args. band in valid_bands:
-        if args.band is "2.4" or "5.0":
-            band = str(args.band)
-            print("[*] Scanning on {0}GHz band".format(band))
-        else:
-            print("[*] No band defined, defaulting to 2.4GHz.")
-            band = "2.4"
+    valid_bands = ["2.4", "5.0"]
+    if args.band is None:
+        print("[*] No band defined, defaulting to 2.4GHz.")
+        band = "2.4"
+    elif args.band in valid_bands:
+        band = str(args.band)
+        print("[*] Scanning on {0}GHz band".format(band))
     else:
         print("[!] Error, invalid band selected!")
         print(parser.usage)

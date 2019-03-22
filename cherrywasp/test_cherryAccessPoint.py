@@ -1,5 +1,5 @@
 from unittest import TestCase
-from cherrywasp import accesspoint
+import accesspoint
 
 
 class TestCherryAccessPoint(TestCase):

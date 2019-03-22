@@ -1,5 +1,5 @@
 from unittest import TestCase
-from cherrywasp import logger
+import logger
 from datetime import datetime
 import os
 

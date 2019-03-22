@@ -1,5 +1,5 @@
 from unittest import TestCase
-from cherrywasp import corescanner
+import corescanner
 from scapy.all import *
 
 

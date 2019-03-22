@@ -1,5 +1,5 @@
 from termcolor import colored
-from cherrywasp import logger
+import logger
 
 
 class CherryAccessPoint:
