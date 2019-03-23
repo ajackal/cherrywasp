@@ -3,9 +3,9 @@ import argparse
 import os
 import datetime
 from threading import Thread
-import accesspoint
-import client
-import logger
+import cherrywasp.accesspoint
+import cherrywasp.client
+import cherrywasp.logger
 
 
 class CherryWasp:
@@ -89,7 +89,7 @@ class CherryWasp:
                     essid = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.info%}")
                     bssid = pkt.sprintf("%Dot11.addr2%")
                     if bssid not in self.access_points:
-                        new_ap = accesspoint.CherryAccessPoint(bssid, self.file_prefix)
+                        new_ap = cherrywasp.accesspoint.CherryAccessPoint(bssid, self.file_prefix)
                         self.access_points[bssid] = new_ap
                     if essid != "b''":
                         return self.access_points[bssid].add_new_beaconed_essid(essid)
@@ -98,7 +98,7 @@ class CherryWasp:
                     essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
                     bssid = pkt.sprintf("%Dot11.addr2%")
                     if bssid not in self.clients:
-                        new_client = client.CherryClient(bssid, self.file_prefix)
+                        new_client = cherrywasp.client.CherryClient(bssid, self.file_prefix)
                         self.clients[bssid] = new_client
                     if essid != "b''":
                         return self.clients[bssid].add_new_requested_essid(essid)
@@ -129,7 +129,7 @@ def main():
             now = datetime.datetime.now()
             file_prefix = str(now.year) + str(now.month) + str(now.day)
         cherry_wasp.file_prefix = file_prefix
-        log = logger.CherryLogger()
+        log = cherrywasp.logger.CherryLogger()
         log.file_setup(cherry_wasp.file_prefix)
     else:
         print("[!] Error, starting the listener!")
