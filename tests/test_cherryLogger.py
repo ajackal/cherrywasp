@@ -1,5 +1,5 @@
 from unittest import TestCase
-import logger
+import cherrywasp.logger
 from datetime import datetime
 import os
 
@@ -10,7 +10,7 @@ class TestCherryLogger(TestCase):
         now = datetime.now()
         file_prefix = str(now.year) + str(now.month) + str(now.day)
         filename = file_prefix + "_beacon.csv"
-        log = logger.CherryLogger()
+        log = cherrywasp.logger.CherryLogger()
         log.file_setup(file_prefix)
         if os.path.isdir(os.path.join(os.getcwd(), "logs")) and os.path.isfile(os.path.join(os.getcwd(), "logs", filename)):
             expected = True
@@ -37,7 +37,7 @@ class TestCherryLogger(TestCase):
         essid = "FBI_van_1"
         now = datetime.now()
         file_prefix = str(now.year) + str(now.month) + str(now.day)
-        log = logger.CherryLogger()
+        log = cherrywasp.logger.CherryLogger()
         log.file_name_prefix = file_prefix
         log.write_to_file("beacon", bssid, essid)
         with open(log_file) as open_file:
