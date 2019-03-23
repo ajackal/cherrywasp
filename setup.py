@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='cherrywasp',
-    version='2.0',
+    version='2.1',
     packages=['cherrywasp'],
     url='https://github.com/ajackal/cherry-wasp.git',
     license='',
