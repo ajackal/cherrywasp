@@ -115,15 +115,12 @@ def main():
     parser.add_argument('-b', '--band', help='specify the band to scan, 2.4 or 5.0')
     parser.add_argument('-B', '--bssid', help='specify bssid to filter <mode 0 only> <optional>')
     parser.add_argument('-o', '--output', help='specify a file prefix for saved files.')
+    parser.add_argument('-c', '--channel-hop', action='store_ture', help='add this optiont to force channel hopping for the selected band/mode.')
     args = parser.parse_args()
 
     valid_modes = ["0", "1", "2"]
     if args.mode is not None and args.mode in valid_modes:
         scan_type = args.mode
-        if scan_type == "1":
-            channel_hop = False
-        else:
-            channel_hop = True
         cherry_wasp = CoreScanner(scan_type)
         if args.output is not None:
             file_prefix = args.output
@@ -162,19 +159,22 @@ def main():
         exit(-1)
 
     if args.bssid is None:
-        if channel_hop:
+        if args.channel_hop:
             channel_hopper = Thread(target=cherry_wasp.channel_hop, args=[band, args.interface])
             channel_hopper.daemon = True
             channel_hopper.start()
         sniff(prn=cherry_wasp.scan_packet, store=0)
     else:  # TODO: add BSSID input validation here
         if args.mode == "0":
-            filter_bssid = str("ether src " + args.bssid)
-            if channel_hop:
+            if args.bssid is not None:
+                filter_bssid = str("ether src " + args.bssid)
+                sniff(filter=filter_bssid, prn=cherry_wasp.scan_packet, store=0)
+            else:
+                sniff(prn=cherry_wasp.scan_packet, store=0)
+            if args.channel_hop:
                 channel_hopper = Thread(target=cherry_wasp.channel_hop, args=[band, args.interface])
                 channel_hopper.daemon = True
                 channel_hopper.start()
-            sniff(filter=filter_bssid, prn=cherry_wasp.scan_packet, store=0)
         else:
             print("[!] Invalid mode selected. No mode selected or must use mode 0 when filtering by BSSID")
             print(parser.usage)
