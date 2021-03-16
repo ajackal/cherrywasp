@@ -1,5 +1,5 @@
 from termcolor import colored
-import cherrywasp.logger
+from cherrywasp import logger
 
 
 class CherryAccessPoint:
@@ -18,7 +18,7 @@ class CherryAccessPoint:
         self.type = "access_point"
         self.bssid = bssid
         self.beaconed_essid = set()
-        self.log = cherrywasp.logger.CherryLogger()
+        self.log = logger.CherryLogger()
         self.log.file_name_prefix = file_prefix
 
     # TODO: Add channel to the output & file.

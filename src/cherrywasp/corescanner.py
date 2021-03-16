@@ -1,14 +1,16 @@
-from scapy.all import *
 import argparse
 import os
 import datetime
+
+from scapy.all import *
 from threading import Thread
-import cherrywasp.accesspoint
-import cherrywasp.client
-import cherrywasp.logger
+
+from cherrywasp import accesspoint
+from cherrywasp import client
+from cherrywasp import logger
 
 
-class CherryWasp:
+class CoreScanner:
     """ Cherry Wasp
 
         The object that inspects each packet and determines how to handle it.
@@ -89,7 +91,7 @@ class CherryWasp:
                     essid = pkt.sprintf("{Dot11Beacon:%Dot11Beacon.info%}")
                     bssid = pkt.sprintf("%Dot11.addr2%")
                     if bssid not in self.access_points:
-                        new_ap = cherrywasp.accesspoint.CherryAccessPoint(bssid, self.file_prefix)
+                        new_ap = accesspoint.CherryAccessPoint(bssid, self.file_prefix)
                         self.access_points[bssid] = new_ap
                     if essid != "b''":
                         return self.access_points[bssid].add_new_beaconed_essid(essid)
@@ -98,7 +100,7 @@ class CherryWasp:
                     essid = pkt.sprintf("{Dot11ProbeReq:%Dot11ProbeReq.info%}")
                     bssid = pkt.sprintf("%Dot11.addr2%")
                     if bssid not in self.clients:
-                        new_client = cherrywasp.client.CherryClient(bssid, self.file_prefix)
+                        new_client = client.CherryClient(bssid, self.file_prefix)
                         self.clients[bssid] = new_client
                     if essid != "b''":
                         return self.clients[bssid].add_new_requested_essid(essid)
@@ -118,18 +120,18 @@ def main():
     valid_modes = ["0", "1", "2"]
     if args.mode is not None and args.mode in valid_modes:
         scan_type = args.mode
-        if scan_type is "1":
+        if scan_type == "1":
             channel_hop = False
         else:
             channel_hop = True
-        cherry_wasp = CherryWasp(scan_type)
+        cherry_wasp = CoreScanner(scan_type)
         if args.output is not None:
             file_prefix = args.output
         else:
             now = datetime.datetime.now()
             file_prefix = str(now.year) + str(now.month) + str(now.day)
         cherry_wasp.file_prefix = file_prefix
-        log = cherrywasp.logger.CherryLogger()
+        log = logger.CherryLogger()
         log.file_setup(cherry_wasp.file_prefix)
     else:
         print("[!] Error, starting the listener!")
@@ -166,7 +168,7 @@ def main():
             channel_hopper.start()
         sniff(prn=cherry_wasp.scan_packet, store=0)
     else:  # TODO: add BSSID input validation here
-        if args.mode is "0":
+        if args.mode == "0":
             filter_bssid = str("ether src " + args.bssid)
             if channel_hop:
                 channel_hopper = Thread(target=cherry_wasp.channel_hop, args=[band, args.interface])

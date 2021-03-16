@@ -114,3 +114,4 @@ venv.bak/
 .idea/workspace.xml
 *.py.swp
 cherrywasp/logs/
+logs/
